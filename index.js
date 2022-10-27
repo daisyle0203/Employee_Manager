@@ -1,28 +1,26 @@
 const inquirer = require("inquirer")
 const mysql = require("mysql2")
-const cTable = require("console.table")
 require("dotenv").config()
 
-const PORT = process.env.PORT || 3001
+const cTable = require("console.table")
 
 const db = mysql.createConnection({
-  host: PORT,
+  host: "localhost",
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 })
+
 console.log(
-  `***********************************
-   *                                 *
-   *        EMPLOYEE MANAGER         *
-   *                                 *
-   ***********************************`
+  `     ***********************************
+     *                                 *
+     *        EMPLOYEE MANAGER         *
+     *                                 *
+     ***********************************`
 )
 
-promptUser()
-
-const promptUser = () => {
-  return inquirer
+promptUser = () => {
+  inquirer
     .prompt([
       {
         type: "list",
@@ -50,15 +48,25 @@ const promptUser = () => {
       const { choices } = answers
 
       if (choices === "View All Departments") {
-        showDepartments()
+        showDepartments().then((department) => {
+          console.table(department[0])
+        })
+
+        promptUser()
       }
 
       if (choices === "View All Roles") {
-        showRoles()
+        showRoles().then((role) => {
+          console.table(role[0])
+        })
+
+        promptUser()
       }
 
       if (choices === "View All Employees") {
-        showEmployees()
+        showEmployees().then((employee) => {
+          console.table(employee[0])
+        })
       }
 
       if (choices === "Add A Department") {
@@ -107,17 +115,71 @@ const promptUser = () => {
     })
 }
 
-// showDepartments() => {}
-// showRoles() => {}
-// showEmployees() => {}
-// addDepartment() => {}
-// addRole() => {}
-// addEmployee() => {}
-// updateEmployee() => {}
-// updateManager() => {}
-// employeeDepartment() => {}
-// deleteDepartment() => {}
-// deleteRole() => {}
-// deleteEmployee() => {}
-// viewBudget() => {}
+showDepartments = () => {
+  return db
+    .promise()
+    .query("SELECT d.id, d.name AS department FROM department as d;")
+}
+
+showRoles = () => {
+  return db
+    .promise()
+    .query(
+      "SELECT r.id, r.title, d.name AS department, r.salary FROM role as r JOIN department as d ON r.department_id = d.id;"
+    )
+}
+
+showEmployees = () => {
+  return db
+    .promise()
+    .query(
+      "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;"
+    )
+}
+
+addDepartment = () => {
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "addDep",
+      message: "What would you like to do?",
+      validate: (addDep) => {
+        if (addDep) {
+          return true
+        } else {
+          console.log(` Please enter a department!`)
+        }
+      },
+    },
+  ])
+
+  return db.promise().query("")
+}
+
+// addRole = () => {
+//   return db.promise().query("")
+// }
+
+// addEmployee = () => {
+//   return db.promise().query("")
+// }
+
+// updateEmployee = () => {
+//   return db.promise().query("")
+// }
+
+// updateManager = () => {
+//   return db.promise().query("")
+// }
+
+// employeeDepartment = () => {}
+
+// deleteDepartment = () => {}
+
+// deleteRole = () => {}
+
+// deleteEmployee = () => {}
+
+// viewBudget = () => {}
+
 // db.end()
