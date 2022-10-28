@@ -4,6 +4,15 @@ require("dotenv").config()
 
 const db = require("./db/connection")
 
+const getTargetValue = (array)=>{
+  return array.map(object=>object.target)
+}
+
+const getId = (array, value)=>{
+  return array.filter(object => object.target === value)[0].id
+}
+
+
 const promptUser = () => {
   inquirer
     .prompt([
@@ -104,7 +113,7 @@ const showRoles = () => {
   return db
     .promise()
     .query(
-      "SELECT r.id, r.title, d.name AS department, r.salary FROM role as r JOIN department as d ON r.department_id = d.id;"
+      "SELECT r.id, r.title, d.name AS department, r.salary FROM role as r JOIN department as d ON r.department_id = d.id ORDER BY r.id;"
     )
     .then((role) => {
       console.table(role[0])
@@ -154,11 +163,13 @@ const addDepartment = () => {
     })
 }
 
-const addRole = () => {
+const addRole = async () => { 
+  let departments = await db.promise().query("SELECT d.id, d.name AS target FROM department as d;")
+  let departmentChoices = getTargetValue(departments[0])
   inquirer.prompt([
     {
       type: "input",
-      name: "role",
+      name: "title",
       message: "What role would you like to add?",
       validate: (addRole) => {
         if (addRole) {
@@ -174,7 +185,7 @@ const addRole = () => {
       name: "salary",
       message: "What is the salary of the role?",
       validate: (addSalary) => {
-        if (isNaN(addSalary)) {
+        if (parseInt(addSalary)) {
           return true
         } else {
           console.log(` Please enter a salary!`)
@@ -186,9 +197,24 @@ const addRole = () => {
       type: "list",
       name: "dept",
       message: "What department does the role belong to?",
-      choices: dep,
+      choices: departmentChoices,
     },
-  ])
+  ]).then((answer) => {
+
+    console.log(answer)
+    let departmentId = getId(departments[0], answer.dept)
+    console.log(departmentId)
+    db.query(
+      "INSERT INTO role (title, salary, department_id) VALUES (?,?,?)",
+      [answer.title, parseInt(answer.salary), departmentId],
+      (err, result) => {
+        if (err) console.log(err)
+        console.log("Added " + answer.title + " to the database!")
+        showDepartments()
+      }
+    )
+  })
+
 }
 
 // addEmployee = () => {
