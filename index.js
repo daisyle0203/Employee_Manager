@@ -1,23 +1,8 @@
 const inquirer = require("inquirer")
-const mysql = require("mysql2")
+
 require("dotenv").config()
 
-const cTable = require("console.table")
-
-const db = mysql.createConnection({
-  host: "localhost",
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-})
-
-console.log(
-  `     ***********************************
-     *                                 *
-     *        EMPLOYEE MANAGER         *
-     *                                 *
-     ***********************************`
-)
+const db = require("./db/connection")
 
 const promptUser = () => {
   inquirer
@@ -144,7 +129,7 @@ const addDepartment = () => {
     .prompt([
       {
         type: "input",
-        name: "addDep",
+        name: "dept",
         message: "What department would you like to add?",
         validate: (addDep) => {
           if (addDep) {
@@ -159,14 +144,51 @@ const addDepartment = () => {
     .then((answer) => {
       db.query(
         "INSERT INTO department (name) VALUES (?)",
-        answer.addDep,
+        answer.dept,
         (err, result) => {
           if (err) console.log(err)
-          console.log("Added " + answer.addDept + " to the database!")
+          console.log("Added " + answer.dept + " to the database!")
           showDepartments()
         }
       )
     })
+}
+
+const addRole = () => {
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "role",
+      message: "What role would you like to add?",
+      validate: (addRole) => {
+        if (addRole) {
+          return true
+        } else {
+          console.log(` Please enter a role!`)
+          return false
+        }
+      },
+    },
+    {
+      type: "input",
+      name: "salary",
+      message: "What is the salary of the role?",
+      validate: (addSalary) => {
+        if (isNaN(addSalary)) {
+          return true
+        } else {
+          console.log(` Please enter a salary!`)
+          return false
+        }
+      },
+    },
+    {
+      type: "list",
+      name: "dept",
+      message: "What department does the role belong to?",
+      choices: dep,
+    },
+  ])
 }
 
 // addEmployee = () => {
