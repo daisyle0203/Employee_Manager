@@ -1,5 +1,7 @@
 const mysql = require("mysql2")
 const cTable = require("console.table")
+const logo = require("asciiart-logo")
+require("dotenv").config()
 
 const db = mysql.createConnection({
   host: "localhost",
@@ -8,16 +10,14 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME,
 })
 
-console.log(
-  `     ***********************************
-     *                                 *
-     *        EMPLOYEE MANAGER         *
-     *                                 *
-     ***********************************`
-)
+const logoText = logo({
+  name: "Employee Manager",
+  logoColor: "bold-cyan",
+  borderColor: "bold-blue",
+}).render()
 
 db.connect(function (err) {
   if (err) throw err
 })
 
-module.exports = db
+module.exports = { db,logoText }

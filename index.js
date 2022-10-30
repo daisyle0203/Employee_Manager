@@ -1,20 +1,10 @@
 const inquirer = require("inquirer")
-const logo = require("asciiart-logo")
 
-require("dotenv").config()
-
-const db = require("./db/connection")
+const { db, logoText } = require("./db/connection")
 
 function init() {
-  const logoText = logo({
-    name: "Employee Manager",
-    logoColor: "bold-cyan",
-    borderColor: "bold-blue",
-  }).render()
-
-  console.log(logoText)
-
-  promptUser()
+   console.log(logoText)
+   promptUser()
 }
 
 const getTargetValue = (array) => {
