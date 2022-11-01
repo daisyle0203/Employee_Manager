@@ -67,40 +67,34 @@ const promptUser = () => {
 }
 
 // Function to show all the department
-const showDepartments = () => {
-  return db
+const showDepartments = async () => {
+  const departments = await db
     .promise()
     .query("SELECT d.id, d.name AS department FROM department as d;")
-    .then((department) => {
-      console.table(department[0])
-      promptUser()
-    })
+  console.table(departments[0])
+  promptUser()
 }
 
 // Function to show all the role
-const showRoles = () => {d
-  return db
+const showRoles = async () => {
+  const roles = await db
     .promise()
     .query(
       "SELECT r.id, r.title, d.name AS department, r.salary FROM role as r JOIN department as d ON r.department_id = d.id ORDER BY r.id;"
     )
-    .then((role) => {
-      console.table(role[0])
-      promptUser()
-    })
+  console.table(roles[0])
+  promptUser()
 }
 
 // Function to show all the employee
-const showEmployees = () => {
-  return db
+const showEmployees = async () => {
+  const employees = await db
     .promise()
     .query(
       "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;"
     )
-    .then((employee) => {
-      console.table(employee[0])
-      promptUser()
-    })
+  console.table(employees[0])
+  promptUser()
 }
 
 // Function to add a department
