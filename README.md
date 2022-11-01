@@ -51,6 +51,9 @@ node index.js
 ## Demo :
 
 ---
+
+[Click here to watch the demo on Screencastify!](https://drive.google.com/file/d/10xONofknfs8RtYtE68ClHVJLH51Yg5K4/view?usp=sharing)
+
 The database schema as shown in the following image:
 
 ![The database schema as shown in the following image](./assets/images/screenshot1.png)
@@ -59,7 +62,6 @@ The command-line application using Node.js, Inquirer, and MySQL:
 
 ![The command-line application  using Node.js, Inquirer, and MySQL](./assets/images/screenshot2.png)
 
-[Click here to watch the demo on Screencastify!](https://drive.google.com/file/d/1rkTnSc0OGjL4_A1vY9j8mV6DBQL4sn9p/view)
 
 ## License:
 
