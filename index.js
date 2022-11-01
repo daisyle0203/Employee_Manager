@@ -1,20 +1,15 @@
+// Import inquirer
 const inquirer = require("inquirer")
-
+// Import database and logo from db folder
 const { db, logoText } = require("./db/connection")
 
+// Function to print the logo and fire the promptUser function
 function init() {
    console.log(logoText)
    promptUser()
 }
 
-const getTargetValue = (array) => {
-  return array.map((object) => object.target)
-}
-
-const getId = (array, value) => {
-  return array.filter((object) => object.target == value)[0].id
-}
-
+// Function to start prompting user questions
 const promptUser = () => {
   inquirer
     .prompt([
@@ -71,6 +66,7 @@ const promptUser = () => {
     })
 }
 
+// Function to show all the department
 const showDepartments = () => {
   return db
     .promise()
@@ -81,7 +77,8 @@ const showDepartments = () => {
     })
 }
 
-const showRoles = () => {
+// Function to show all the role
+const showRoles = () => {d
   return db
     .promise()
     .query(
@@ -93,6 +90,7 @@ const showRoles = () => {
     })
 }
 
+// Function to show all the employee
 const showEmployees = () => {
   return db
     .promise()
@@ -105,6 +103,7 @@ const showEmployees = () => {
     })
 }
 
+// Function to add a department
 const addDepartment = () => {
   inquirer
     .prompt([
@@ -135,11 +134,21 @@ const addDepartment = () => {
     })
 }
 
+
+// Function to add a role
 const addRole = async () => {
+  const getDepartment = (array) => {
+    return array.map((object) => object.department)
+  }
+  
+  const getId = (array, value) => {
+    return array.filter((object) => object.department == value)[0].id
+  }
+  
   const departments = await db
     .promise()
-    .query("SELECT d.id, d.name AS target FROM department as d;")
-  const departmentChoices = getTargetValue(departments[0])
+    .query("SELECT d.id, d.name AS department FROM department as d;")
+  const departmentChoices = getDepartment(departments[0])
 
   inquirer
     .prompt([
@@ -190,6 +199,8 @@ const addRole = async () => {
     })
 }
 
+
+// Function to add an employee
 const addEmployee = async () => {
   let roles = await db.promise().query("SELECT role.id, role.title FROM role")
   roles = roles[0]
@@ -248,7 +259,6 @@ const addEmployee = async () => {
       },
     ])
     .then((answer) => {
-      console.log(answer)
       db.query(
         "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)",
         [answer.firstName, answer.lastName, answer.title , answer.manager],
@@ -264,13 +274,14 @@ const addEmployee = async () => {
 
 }
 
+// Function to update an employee
 const updateEmployee = async () => {
   const employees = await db.promise().query("SELECT * FROM employee;")
   const employeeChoices = employees[0].map(({ id, first_name, last_name }) => ({
     name: `${first_name} ${last_name}`,
     value: id,
   }))
-  console.log(employeeChoices);
+
 
   let roles = await db.promise().query("SELECT role.id, role.title FROM role")
   roles = roles[0]
@@ -278,7 +289,7 @@ const updateEmployee = async () => {
     name: `${title}`,
     value: id,
   }))
-  console.log(roleChoices);
+
 
   inquirer
     .prompt([
@@ -296,8 +307,6 @@ const updateEmployee = async () => {
       },
     ])
     .then((answer) => {
-      console.log(answer);
-      console.log(answer);
       db.query(
         "UPDATE employee SET role_id = ? WHERE id = ?;", [answer.role, answer.employee],
         (err, result) => {
@@ -309,4 +318,5 @@ const updateEmployee = async () => {
     })
 }
 
+// Call the init function
 init()
